@@ -1,0 +1,10 @@
+{
+  "name": "SPI-KIU - Student ID Verification & Security Portal",
+  "description": "Campus checkpoint student ID verification and access control system for Kampala International University. Scans IDs, validates active enrollment against the student registry, flags expired or unauthorized credentials, and logs entry security metrics.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
