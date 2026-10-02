@@ -12,26 +12,30 @@ import { LogView } from './components/LogView';
 import { RegistryView } from './components/RegistryView';
 import { CardsView } from './components/CardsView';
 import { OfficerAuthModal } from './components/OfficerAuthModal';
+import { RegistrarAuthModal } from './components/RegistrarAuthModal';
 import { CameraScannerModal } from './components/CameraScannerModal';
 import { BadgeModal } from './components/BadgeModal';
 import {
   getActiveOfficer,
+  getActiveRegistrarStaff,
   getScanLogs,
   getStoredStats,
   getStoredStudents,
   saveActiveOfficer,
+  saveActiveRegistrarStaff,
   saveScanLogs,
   saveStoredStats,
   saveStoredStudents,
   verifyStudentId
 } from './utils/storage';
 import { sounds } from './utils/audio';
-import { CheckpointStats, ScanRecord, SecurityOfficer, Student, StudentStatus } from './types';
+import { CheckpointStats, RegistrarStaff, ScanRecord, SecurityOfficer, Student, StudentStatus } from './types';
 import { Shield, PhoneCall, MapPin, University } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'scanner' | 'logs' | 'registry' | 'cards'>('scanner');
   const [officer, setOfficer] = useState<SecurityOfficer | null>(null);
+  const [registrarStaff, setRegistrarStaff] = useState<RegistrarStaff | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [logs, setLogs] = useState<ScanRecord[]>([]);
   const [stats, setStats] = useState<CheckpointStats>({
@@ -46,6 +50,7 @@ export default function App() {
 
   // Modals
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isRegistrarModalOpen, setIsRegistrarModalOpen] = useState(false);
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
   const [badgeModalStudent, setBadgeModalStudent] = useState<Student | null>(null);
 
@@ -55,11 +60,13 @@ export default function App() {
   // Initialize data on mount
   useEffect(() => {
     const loadedOfficer = getActiveOfficer();
+    const loadedRegistrar = getActiveRegistrarStaff();
     const loadedStudents = getStoredStudents();
     const loadedLogs = getScanLogs();
     const loadedStats = getStoredStats();
 
     setOfficer(loadedOfficer);
+    setRegistrarStaff(loadedRegistrar);
     setStudents(loadedStudents);
     setLogs(loadedLogs);
     setStats(loadedStats);
@@ -73,6 +80,16 @@ export default function App() {
     const next = !isMuted;
     sounds.setMuted(next);
     setIsMuted(next);
+  };
+
+  const handleRegistrarLoginSuccess = (staff: RegistrarStaff) => {
+    setRegistrarStaff(staff);
+    saveActiveRegistrarStaff(staff);
+  };
+
+  const handleRegistrarLogout = () => {
+    setRegistrarStaff(null);
+    saveActiveRegistrarStaff(null);
   };
 
   const handleScanCode = (code: string) => {
@@ -179,7 +196,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-200">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500/20 selection:text-emerald-200">
       {/* Top Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -197,27 +214,29 @@ export default function App() {
         {activeTab === 'scanner' && (
           <ScannerView
             officer={officer}
-            stats={stats}
             students={students}
             latestScan={latestScan}
-            recentScans={logs.slice(0, 5)}
             onScanCode={handleScanCode}
-            onOpenScannerModal={() => setIsCameraModalOpen(true)}
-            onResetStats={handleResetStats}
           />
         )}
 
         {activeTab === 'logs' && (
-          <LogView logs={logs} onClearLogs={handleClearLogs} />
+          <LogView
+            logs={logs}
+            stats={stats}
+            onClearLogs={handleClearLogs}
+            onResetStats={handleResetStats}
+          />
         )}
 
         {activeTab === 'registry' && (
           <RegistryView
             students={students}
+            registrarStaff={registrarStaff}
+            onOpenRegistrarAuth={() => setIsRegistrarModalOpen(true)}
+            onRegistrarLogout={handleRegistrarLogout}
             onAddStudent={handleAddStudent}
             onUpdateStudentStatus={handleUpdateStudentStatus}
-            onScanStudent={handleScanCode}
-            onPreviewBadge={(stu) => setBadgeModalStudent(stu)}
           />
         )}
 
@@ -230,9 +249,9 @@ export default function App() {
       <footer className="border-t border-slate-800 bg-slate-950/80 text-xs text-slate-500 py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-amber-500" />
-            <span className="font-semibold text-slate-400">SPI-KIU</span>
-            <span>· Campus Security & Access Control System</span>
+            <Shield className="h-4 w-4 text-emerald-500" />
+            <span className="font-semibold text-slate-400">SPITE</span>
+            <span>· Security Protocol for Identification, Tracking &amp; Enrollment</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-500">
@@ -241,7 +260,7 @@ export default function App() {
               Main Campus (Ggaba Rd, Kansanga) & Western Campus (Ishaka)
             </span>
             <span className="text-slate-700 hidden md:inline">|</span>
-            <span className="flex items-center gap-1 text-amber-500/80">
+            <span className="flex items-center gap-1 text-emerald-500/90">
               <PhoneCall className="h-3 w-3" />
               Campus Security Hotline: +256 701 000 911
             </span>
@@ -255,6 +274,12 @@ export default function App() {
         onClose={() => setIsLoginModalOpen(false)}
         currentOfficer={officer}
         onLoginSuccess={handleLoginSuccess}
+      />
+
+      <RegistrarAuthModal
+        isOpen={isRegistrarModalOpen}
+        onClose={() => setIsRegistrarModalOpen(false)}
+        onLoginSuccess={handleRegistrarLoginSuccess}
       />
 
       <CameraScannerModal

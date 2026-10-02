@@ -1,6 +1,6 @@
 import femalePhoto1 from '@/src/assets/images/student_portrait_female_1_1790940633236.jpg';
 import malePhoto1 from '@/src/assets/images/student_portrait_male_1_1790940644556.jpg';
-import { SecurityOfficer, Student } from '../types';
+import { RegistrarStaff, SecurityOfficer, Student } from '../types';
 
 export const INITIAL_OFFICERS: SecurityOfficer[] = [
   {
@@ -35,6 +35,36 @@ export const INITIAL_OFFICERS: SecurityOfficer[] = [
     checkpoint: 'Postgraduate & Admin Gate',
     shift: 'Morning Shift (06:00 - 14:00)',
     lastLoginTime: 'Today at 05:45 AM'
+  }
+];
+
+export const INITIAL_REGISTRAR_STAFF: RegistrarStaff[] = [
+  {
+    id: 'reg-01',
+    staffId: 'KIU-REG-2026',
+    fullName: 'Dr. Marvin Tumusiime',
+    username: 'registrar.marvin',
+    role: 'Academic Registrar',
+    department: 'Office of the Academic Registrar',
+    authenticatedAt: 'Today at 08:30 AM'
+  },
+  {
+    id: 'reg-02',
+    staffId: 'KIU-ID-044',
+    fullName: 'Ms. Christine Nansubuga',
+    username: 'cards.nansubuga',
+    role: 'ID Production Officer',
+    department: 'Directorate of ICT & ID Card Issuance',
+    authenticatedAt: 'Today at 09:00 AM'
+  },
+  {
+    id: 'reg-03',
+    staffId: 'KIU-DOS-011',
+    fullName: 'Rev. Fr. Emmanuel Okello',
+    username: 'director.students',
+    role: 'Directorate of Student Affairs',
+    department: 'Dean of Students Office',
+    authenticatedAt: 'Yesterday at 11:15 AM'
   }
 ];
 

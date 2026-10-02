@@ -25,7 +25,7 @@ export const StudentSelectModal: React.FC<StudentSelectModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
               <Users className="h-5 w-5" />
             </div>
             <div>
@@ -35,7 +35,7 @@ export const StudentSelectModal: React.FC<StudentSelectModalProps> = ({
                 </h3>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Students sharing the name &quot;<span className="text-amber-400 font-semibold">{query}</span>&quot;. Select the individual present at the checkpoint:
+                Students sharing the name &quot;<span className="text-emerald-400 font-semibold">{query}</span>&quot;. Select the individual present at the checkpoint:
               </p>
             </div>
           </div>
@@ -62,7 +62,7 @@ export const StudentSelectModal: React.FC<StudentSelectModalProps> = ({
               <div
                 key={student.id}
                 onClick={() => onSelectCandidate(student)}
-                className="group relative cursor-pointer rounded-xl border border-slate-800 bg-slate-950/70 p-4 transition-all hover:border-amber-500/60 hover:bg-slate-850 hover:shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="group relative cursor-pointer rounded-xl border border-slate-800 bg-slate-950/70 p-4 transition-all hover:border-emerald-500/60 hover:bg-slate-850 hover:shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
                 {/* Left: Photo and details */}
                 <div className="flex items-center gap-4 min-w-0">
@@ -70,14 +70,14 @@ export const StudentSelectModal: React.FC<StudentSelectModalProps> = ({
                     src={student.photoUrl}
                     alt={student.fullName}
                     referrerPolicy="no-referrer"
-                    className="h-14 w-12 rounded-lg object-cover border-2 border-slate-700 group-hover:border-amber-400 shrink-0 transition-colors"
+                    className="h-14 w-12 rounded-lg object-cover border-2 border-slate-700 group-hover:border-emerald-400 shrink-0 transition-colors"
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
+                      <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors truncate">
                         {student.fullName}
                       </h4>
-                      <span className="font-mono text-xs font-extrabold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                      <span className="font-mono text-xs font-extrabold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                         {student.regNumber}
                       </span>
                     </div>
@@ -89,7 +89,7 @@ export const StudentSelectModal: React.FC<StudentSelectModalProps> = ({
 
                     <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
                       <span className="flex items-center gap-1 truncate">
-                        <MapPin className="h-3 w-3 text-amber-500/80 shrink-0" />
+                        <MapPin className="h-3 w-3 text-emerald-500/80 shrink-0" />
                         <span>{student.campus.split('-')[0].trim()}</span>
                       </span>
                       <span>·</span>
@@ -127,7 +127,7 @@ export const StudentSelectModal: React.FC<StudentSelectModalProps> = ({
                       e.stopPropagation();
                       onSelectCandidate(student);
                     }}
-                    className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-slate-950 group-hover:bg-amber-400 transition-colors shadow-sm"
+                    className="flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-bold text-slate-950 group-hover:bg-emerald-400 transition-colors shadow-sm"
                   >
                     <span>Verify ID</span>
                     <ArrowRight className="h-3.5 w-3.5" />

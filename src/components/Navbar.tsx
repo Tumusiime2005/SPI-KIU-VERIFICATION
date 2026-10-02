@@ -28,20 +28,20 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Zone 1: Brand title wordmark */}
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-slate-950 shadow-md shadow-amber-500/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 text-slate-950 shadow-md shadow-emerald-500/20">
             <Shield className="h-5 w-5 stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-base font-extrabold tracking-wider text-amber-400">
-                SPI-KIU
+              <span className="font-mono text-base font-extrabold tracking-wider text-emerald-400">
+                SPITE
               </span>
               <span className="hidden text-xs font-semibold uppercase tracking-widest text-slate-400 sm:inline">
                 Security Portal
               </span>
             </div>
             <p className="text-[11px] font-medium text-slate-400">
-              Kampala International University
+              Security Protocol for Identification, Tracking &amp; Enrollment
             </p>
           </div>
         </div>
@@ -52,45 +52,45 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('scanner')}
             className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${
               activeTab === 'scanner'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            Checkpoint Scanner
+            Checkpoint
           </button>
 
           <button
             onClick={() => setActiveTab('logs')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${
               activeTab === 'logs'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            <span>Live Security Log</span>
+            <span>Logs & Details</span>
             {deniedCount > 0 && (
               <span className="px-1.5 py-0.2 text-[10px] font-mono font-bold bg-rose-900/80 text-rose-200 border border-rose-700/60 rounded">
-                {deniedCount}
+                {deniedCount} denied
               </span>
             )}
           </button>
 
           <button
             onClick={() => setActiveTab('registry')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
               activeTab === 'registry'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            Student Registry (SQL DB)
+            <span>Registrar &amp; ID Issuance</span>
           </button>
 
           <button
             onClick={() => setActiveTab('cards')}
             className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${
               activeTab === 'cards'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -108,7 +108,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700 hover:text-slate-200 transition-colors"
           >
-            {isMuted ? <VolumeX className="h-4 w-4 text-rose-400" /> : <Volume2 className="h-4 w-4 text-amber-400" />}
+            {isMuted ? <VolumeX className="h-4 w-4 text-rose-400" /> : <Volume2 className="h-4 w-4 text-emerald-400" />}
           </button>
 
           {/* Active Officer Status */}
@@ -120,7 +120,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {officer.fullName}
                 </span>
                 <span className="text-[10px] font-mono text-slate-400 flex items-center justify-end gap-1">
-                  <MapPin className="h-3 w-3 text-amber-400" />
+                  <MapPin className="h-3 w-3 text-emerald-400" />
                   {officer.checkpoint.split('(')[0].trim()}
                 </span>
               </div>
@@ -128,9 +128,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenLogin}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-amber-500/50 hover:bg-slate-800 transition-colors"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-emerald-500/50 hover:bg-slate-800 transition-colors"
               >
-                <span className="font-mono text-amber-400 font-bold text-[11px]">
+                <span className="font-mono text-emerald-400 font-bold text-[11px]">
                   {officer.badgeNumber}
                 </span>
                 <span className="hidden sm:inline text-slate-400">| Switch</span>
@@ -149,7 +149,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onOpenLogin}
-              className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-1.5 text-xs font-semibold text-slate-950 hover:bg-amber-400 transition-colors shadow-sm"
+              className="flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-slate-950 hover:bg-emerald-400 transition-colors shadow-sm"
             >
               <LogIn className="h-4 w-4" />
               <span>Officer Login</span>
@@ -163,15 +163,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={() => setActiveTab('scanner')}
           className={`px-2.5 py-1 font-medium rounded ${
-            activeTab === 'scanner' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
+            activeTab === 'scanner' ? 'bg-emerald-500 text-slate-950 font-semibold' : 'text-slate-400'
           }`}
         >
-          Scanner
+          Checkpoint
         </button>
         <button
           onClick={() => setActiveTab('logs')}
           className={`px-2.5 py-1 font-medium rounded ${
-            activeTab === 'logs' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
+            activeTab === 'logs' ? 'bg-emerald-500 text-slate-950 font-semibold' : 'text-slate-400'
           }`}
         >
           Logs ({deniedCount > 0 ? `${deniedCount} denied` : '0'})
@@ -179,7 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={() => setActiveTab('registry')}
           className={`px-2.5 py-1 font-medium rounded ${
-            activeTab === 'registry' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
+            activeTab === 'registry' ? 'bg-emerald-500 text-slate-950 font-semibold' : 'text-slate-400'
           }`}
         >
           Students DB
@@ -187,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={() => setActiveTab('cards')}
           className={`px-2.5 py-1 font-medium rounded ${
-            activeTab === 'cards' ? 'bg-amber-500 text-slate-950 font-semibold' : 'text-slate-400'
+            activeTab === 'cards' ? 'bg-emerald-500 text-slate-950 font-semibold' : 'text-slate-400'
           }`}
         >
           Badges

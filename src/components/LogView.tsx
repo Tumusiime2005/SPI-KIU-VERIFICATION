@@ -5,20 +5,29 @@ import {
   Search,
   CheckCircle2,
   XCircle,
-  Filter,
   FileSpreadsheet,
-  AlertTriangle,
   Clock,
-  Shield
+  RotateCcw,
+  Users,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle
 } from 'lucide-react';
-import { ScanOutcome, ScanRecord } from '../types';
+import { CheckpointStats, ScanOutcome, ScanRecord } from '../types';
 
 interface LogViewProps {
   logs: ScanRecord[];
+  stats: CheckpointStats;
   onClearLogs: () => void;
+  onResetStats: () => void;
 }
 
-export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
+export const LogView: React.FC<LogViewProps> = ({
+  logs,
+  stats,
+  onClearLogs,
+  onResetStats
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [outcomeFilter, setOutcomeFilter] = useState<'ALL' | ScanOutcome>('ALL');
 
@@ -31,7 +40,8 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
       (log.student?.fullName.toLowerCase().includes(query) ?? false) ||
       log.checkpoint.toLowerCase().includes(query) ||
       log.officerName.toLowerCase().includes(query) ||
-      log.message.toLowerCase().includes(query);
+      log.message.toLowerCase().includes(query) ||
+      (log.student?.course.toLowerCase().includes(query) ?? false);
     return matchesOutcome && matchesSearch;
   });
 
@@ -44,6 +54,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
       'Registration Number',
       'Student Name',
       'Faculty',
+      'Degree Course',
       'Campus',
       'Outcome',
       'Reason',
@@ -59,6 +70,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
       log.scannedCode,
       log.student?.fullName || 'N/A (Unregistered)',
       log.student?.faculty || 'N/A',
+      log.student?.course || 'N/A',
       log.student?.campus || 'N/A',
       log.outcome,
       log.reason,
@@ -75,7 +87,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
     link.setAttribute('href', url);
     link.setAttribute(
       'download',
-      `SPI_KIU_Security_Log_${new Date().toISOString().slice(0, 10)}.csv`
+      `SPITE_Security_Log_${new Date().toISOString().slice(0, 10)}.csv`
     );
     document.body.appendChild(link);
     link.click();
@@ -88,15 +100,104 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header with summary and action buttons */}
+      {/* 1. Shift Metrics & Rejection Counters (moved to Logs as requested) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Total Scanned */}
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 transition-all hover:border-slate-700">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Total Recorded
+            </span>
+            <Users className="h-4 w-4 text-emerald-400" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="font-mono text-2xl sm:text-3xl font-extrabold text-white tabular-nums">
+              {stats.totalScanned}
+            </span>
+            <span className="text-[11px] text-slate-400">students recorded</span>
+          </div>
+        </div>
+
+        {/* Admitted / Granted */}
+        <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/20 p-4 transition-all hover:border-emerald-800/60">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">
+              Access Granted
+            </span>
+            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="font-mono text-2xl sm:text-3xl font-extrabold text-emerald-400 tabular-nums">
+              {stats.granted}
+            </span>
+            <span className="text-[11px] text-emerald-400/80">
+              {stats.totalScanned > 0
+                ? `${Math.round((stats.granted / stats.totalScanned) * 100)}% verified`
+                : '100%'}
+            </span>
+          </div>
+        </div>
+
+        {/* Total Rejections */}
+        <div className="rounded-xl border border-rose-900/60 bg-rose-950/30 p-4 transition-all hover:border-rose-700">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-rose-300">
+              Rejected Student IDs
+            </span>
+            <ShieldAlert className="h-4 w-4 text-rose-400" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="font-mono text-2xl sm:text-3xl font-extrabold text-rose-400 tabular-nums">
+              {stats.denied}
+            </span>
+            <span className="text-[11px] text-rose-400/80">Turned away</span>
+          </div>
+        </div>
+
+        {/* Rejection Causes Breakdown */}
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Rejection Breakdown
+            </span>
+            <button
+              type="button"
+              onClick={onResetStats}
+              title="Reset Counters"
+              className="text-[10px] text-slate-400 hover:text-emerald-400 flex items-center gap-1 transition-colors"
+            >
+              <RotateCcw className="h-3 w-3" />
+              <span>Reset</span>
+            </button>
+          </div>
+          <div className="space-y-1 font-mono text-xs">
+            <div className="flex justify-between text-slate-300">
+              <span className="text-[11px] text-slate-400">Expired Validity:</span>
+              <span className="font-bold text-rose-400 tabular-nums">{stats.expiredCount}</span>
+            </div>
+            <div className="flex justify-between text-slate-300">
+              <span className="text-[11px] text-slate-400">Non-KIU / Unregistered:</span>
+              <span className="font-bold text-rose-400 tabular-nums">
+                {stats.unregisteredCount}
+              </span>
+            </div>
+            <div className="flex justify-between text-slate-300">
+              <span className="text-[11px] text-slate-400">Suspended / Holds:</span>
+              <span className="font-bold text-amber-400 tabular-nums">{stats.suspendedCount}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Header with action buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
         <div>
           <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-amber-400" />
-            <span>Campus Security Checkpoint Access Log</span>
+            <FileSpreadsheet className="h-5 w-5 text-emerald-400" />
+            <span>Comprehensive Checkpoint Security Logs</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Real-time audit trail of all student ID scans, authorizations, and denied entry attempts.
+            Complete records of student access events, validity verifications, and gate security notes.
           </p>
         </div>
 
@@ -105,7 +206,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
             type="button"
             onClick={exportToCSV}
             disabled={logs.length === 0}
-            className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shadow-amber-500/10"
+            className="flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shadow-emerald-500/10"
           >
             <Download className="h-4 w-4" />
             <span>Export CSV</span>
@@ -123,7 +224,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* 3. Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between rounded-xl border border-slate-800 bg-slate-900/80 p-3.5">
         {/* Search */}
         <div className="relative flex-1">
@@ -134,8 +235,8 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by student name, reg number, gate, or message..."
-            className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:border-amber-400 focus:outline-none"
+            placeholder="Search logs by student name, Reg No, course, gate, reason..."
+            className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
           />
         </div>
 
@@ -146,7 +247,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
             onClick={() => setOutcomeFilter('ALL')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
               outcomeFilter === 'ALL'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -177,7 +278,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
         </div>
       </div>
 
-      {/* Log Data Table */}
+      {/* 4. Log Data Table */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-xl">
         {filteredLogs.length > 0 ? (
           <div className="overflow-x-auto">
@@ -185,11 +286,12 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
               <thead>
                 <tr className="border-b border-slate-800 bg-slate-950/80 font-mono text-[11px] text-slate-400 uppercase tracking-wider">
                   <th className="py-3 px-4">Time</th>
-                  <th className="py-3 px-4">Student / ID</th>
+                  <th className="py-3 px-4">Student Details</th>
+                  <th className="py-3 px-4">Course & Campus</th>
                   <th className="py-3 px-4">Status & Reason</th>
-                  <th className="py-3 px-4">Security Verdict Details</th>
-                  <th className="py-3 px-4">Checkpoint Gate</th>
-                  <th className="py-3 px-4 text-right">Duty Officer</th>
+                  <th className="py-3 px-4">Verification Note</th>
+                  <th className="py-3 px-4">Gate</th>
+                  <th className="py-3 px-4 text-right">Officer</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-sans">
@@ -210,20 +312,45 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
 
                     {/* Student Info */}
                     <td className="py-3 px-4">
-                      <div className="flex flex-col">
-                        <span className="font-mono font-bold text-slate-200">
-                          {log.student?.regNumber || log.scannedCode}
-                        </span>
-                        {log.student ? (
-                          <span className="text-slate-400 text-[11px] truncate max-w-xs">
-                            {log.student.fullName}
-                          </span>
-                        ) : (
-                          <span className="text-rose-400 text-[11px] italic">
-                            Non-Student / Unknown
-                          </span>
+                      <div className="flex items-center gap-2.5">
+                        {log.student?.photoUrl && (
+                          <img
+                            src={log.student.photoUrl}
+                            alt=""
+                            className="h-8 w-7 rounded object-cover border border-slate-700 shrink-0"
+                          />
                         )}
+                        <div>
+                          <span className="font-mono font-bold text-slate-200 block">
+                            {log.student?.regNumber || log.scannedCode}
+                          </span>
+                          {log.student ? (
+                            <span className="text-slate-300 text-[11px] truncate max-w-xs block">
+                              {log.student.fullName}
+                            </span>
+                          ) : (
+                            <span className="text-rose-400 text-[11px] italic block">
+                              Non-Student / Unregistered
+                            </span>
+                          )}
+                        </div>
                       </div>
+                    </td>
+
+                    {/* Course & Campus */}
+                    <td className="py-3 px-4 max-w-xs">
+                      {log.student ? (
+                        <div>
+                          <span className="text-slate-300 text-[11px] truncate block font-medium">
+                            {log.student.course}
+                          </span>
+                          <span className="text-[10px] text-slate-400 truncate block">
+                            {log.student.campus.split('-')[0].trim()} · {log.student.level}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-500 text-[11px]">—</span>
+                      )}
                     </td>
 
                     {/* Status & Reason */}
@@ -248,7 +375,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
                     </td>
 
                     {/* Verdict Message */}
-                    <td className="py-3 px-4 max-w-md">
+                    <td className="py-3 px-4 max-w-sm">
                       <p
                         className={`text-[11px] line-clamp-2 ${
                           log.outcome === 'DENIED' ? 'text-rose-200 font-medium' : 'text-slate-300'
@@ -268,7 +395,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
                       <span className="text-slate-300 font-medium block">
                         {log.officerName}
                       </span>
-                      <span className="font-mono text-[10px] text-amber-400">
+                      <span className="font-mono text-[10px] text-emerald-400">
                         {log.officerBadge}
                       </span>
                     </td>
@@ -281,12 +408,12 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onClearLogs }) => {
           <div className="p-12 text-center space-y-2">
             <FileSpreadsheet className="mx-auto h-8 w-8 text-slate-600" />
             <h4 className="text-sm font-semibold text-slate-300">
-              No Checkpoint Scan Logs Found
+              No Checkpoint Scan Logs Recorded
             </h4>
             <p className="text-xs text-slate-500 max-w-xs mx-auto">
               {searchTerm
                 ? 'No records match your search filter.'
-                : 'Scanned student IDs will automatically generate real-time security log entries here.'}
+                : 'Scanned student IDs and verification results will automatically appear here with full details.'}
             </p>
           </div>
         )}

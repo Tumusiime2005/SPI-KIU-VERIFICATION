@@ -179,7 +179,7 @@ export const CameraScannerModal: React.FC<CameraScannerModalProps> = ({
         {/* Modal Top Bar */}
         <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-5 py-3.5">
           <div className="flex items-center gap-2">
-            <Camera className="h-4 w-4 text-amber-400" />
+            <Camera className="h-4 w-4 text-emerald-400" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
               <span>Automatic QR Code ID Scanner</span>
               <span className="font-mono text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800/80 px-1.5 py-0.2 rounded font-normal">
@@ -215,7 +215,7 @@ export const CameraScannerModal: React.FC<CameraScannerModalProps> = ({
             />
           ) : (
             <div className="flex flex-col items-center justify-center text-center p-6 space-y-3 z-10">
-              <div className="h-14 w-14 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-amber-400">
+              <div className="h-14 w-14 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-emerald-400">
                 <ScanLine className="h-7 w-7 animate-pulse" />
               </div>
               <div>
@@ -231,16 +231,16 @@ export const CameraScannerModal: React.FC<CameraScannerModalProps> = ({
 
           {/* Viewfinder Overlay with Corner Brackets & Laser Line */}
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            <div className="relative h-56 w-72 sm:w-80 rounded-xl border-2 border-dashed border-amber-400/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]">
+            <div className="relative h-56 w-72 sm:w-80 rounded-xl border-2 border-dashed border-emerald-400/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]">
               {/* Corner brackets */}
-              <div className="absolute -top-1 -left-1 h-5 w-5 border-t-2 border-l-2 border-amber-400" />
-              <div className="absolute -top-1 -right-1 h-5 w-5 border-t-2 border-r-2 border-amber-400" />
-              <div className="absolute -bottom-1 -left-1 h-5 w-5 border-b-2 border-l-2 border-amber-400" />
-              <div className="absolute -bottom-1 -right-1 h-5 w-5 border-b-2 border-r-2 border-amber-400" />
+              <div className="absolute -top-1 -left-1 h-5 w-5 border-t-2 border-l-2 border-emerald-400" />
+              <div className="absolute -top-1 -right-1 h-5 w-5 border-t-2 border-r-2 border-emerald-400" />
+              <div className="absolute -bottom-1 -left-1 h-5 w-5 border-b-2 border-l-2 border-emerald-400" />
+              <div className="absolute -bottom-1 -right-1 h-5 w-5 border-b-2 border-r-2 border-emerald-400" />
 
               {/* Laser Scanning Beam */}
               {isScanning && !autoCapturedCode && (
-                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_12px_#fbbf24] animate-[bounce_2.2s_infinite]" />
+                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#10b981] animate-[bounce_2.2s_infinite]" />
               )}
 
               {/* Detected QR target highlight */}
@@ -257,7 +257,7 @@ export const CameraScannerModal: React.FC<CameraScannerModalProps> = ({
               )}
 
               <div className="absolute bottom-2 inset-x-0 text-center">
-                <span className="font-mono text-[10px] uppercase font-bold tracking-widest bg-black/70 px-2 py-0.5 rounded text-amber-300">
+                <span className="font-mono text-[10px] uppercase font-bold tracking-widest bg-black/70 px-2 py-0.5 rounded text-emerald-300">
                   {autoCapturedCode ? 'QR CODE CAPTURED!' : 'AUTO-DETECTING QR CODE...'}
                 </span>
               </div>
@@ -282,7 +282,7 @@ export const CameraScannerModal: React.FC<CameraScannerModalProps> = ({
               onClick={() => setTorchOn(!torchOn)}
               className={`p-2 rounded-lg border text-xs flex items-center gap-1.5 transition-colors ${
                 torchOn
-                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold'
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
                   : 'bg-black/60 text-slate-300 border-slate-700 hover:bg-black/80'
               }`}
             >
@@ -304,7 +304,7 @@ export const CameraScannerModal: React.FC<CameraScannerModalProps> = ({
         <div className="border-t border-slate-800 bg-slate-950 p-4 space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <QrCode className="h-3.5 w-3.5 text-amber-400" />
+              <QrCode className="h-3.5 w-3.5 text-emerald-400" />
               <span>Test Automatic QR Code Capture:</span>
             </span>
             <span className="text-[10px] font-mono text-emerald-400 font-semibold">
@@ -318,10 +318,10 @@ export const CameraScannerModal: React.FC<CameraScannerModalProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => handleSimulateAutoDetect(t.code)}
-                className="flex items-start justify-between p-2 rounded-lg border border-slate-800 bg-slate-900/80 hover:border-amber-500/50 hover:bg-slate-800/80 text-left transition-all group"
+                className="flex items-start justify-between p-2 rounded-lg border border-slate-800 bg-slate-900/80 hover:border-emerald-500/50 hover:bg-slate-800/80 text-left transition-all group"
               >
                 <div className="min-w-0 pr-2">
-                  <span className="block text-xs font-semibold text-slate-200 group-hover:text-amber-300 truncate">
+                  <span className="block text-xs font-semibold text-slate-200 group-hover:text-emerald-300 truncate">
                     {t.label.split('(')[0]}
                   </span>
                   <span className="block font-mono text-[10px] text-slate-400">

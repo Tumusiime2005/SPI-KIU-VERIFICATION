@@ -95,7 +95,7 @@ export const OfficerAuthModal: React.FC<OfficerAuthModalProps> = ({
         {/* Top Header */}
         <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
               <Lock className="h-4 w-4" />
             </div>
             <div>
@@ -103,7 +103,7 @@ export const OfficerAuthModal: React.FC<OfficerAuthModalProps> = ({
                 Checkpoint Guard Login
               </h2>
               <p className="text-[11px] text-slate-400">
-                SPI-KIU Gate Access Terminal
+                SPITE Checkpoint Terminal
               </p>
             </div>
           </div>
@@ -139,7 +139,7 @@ export const OfficerAuthModal: React.FC<OfficerAuthModalProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="e.g. officer.marvin or guard.akello"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 required
               />
             </div>
@@ -159,7 +159,7 @@ export const OfficerAuthModal: React.FC<OfficerAuthModalProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 required
               />
             </div>
@@ -177,7 +177,7 @@ export const OfficerAuthModal: React.FC<OfficerAuthModalProps> = ({
               <select
                 value={selectedGate}
                 onChange={(e) => setSelectedGate(e.target.value)}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-slate-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               >
                 {CHECKPOINT_GATES.map((gate) => (
                   <option key={gate} value={gate}>
@@ -200,7 +200,7 @@ export const OfficerAuthModal: React.FC<OfficerAuthModalProps> = ({
               <select
                 value={selectedShift}
                 onChange={(e) => setSelectedShift(e.target.value)}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-slate-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               >
                 <option value="Morning Shift (06:00 - 14:00)">Morning Shift (06:00 - 14:00)</option>
                 <option value="Afternoon Shift (14:00 - 22:00)">Afternoon Shift (14:00 - 22:00)</option>
@@ -222,12 +222,12 @@ export const OfficerAuthModal: React.FC<OfficerAuthModalProps> = ({
                   onClick={() => handleSelectDemoOfficer(off)}
                   className={`px-2 py-1.5 text-[11px] rounded border text-left truncate transition-colors ${
                     username === off.username
-                      ? 'border-amber-500 bg-amber-500/10 text-amber-300 font-semibold'
+                      ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300 font-semibold'
                       : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700'
                   }`}
                   title={`${off.fullName} (${off.badgeNumber})`}
                 >
-                  <span className="block truncate font-mono text-[10px] text-amber-400">
+                  <span className="block truncate font-mono text-[10px] text-emerald-400">
                     {off.badgeNumber}
                   </span>
                   <span className="block truncate">{off.fullName.split(' ')[1]}</span>
@@ -241,7 +241,7 @@ export const OfficerAuthModal: React.FC<OfficerAuthModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 py-2.5 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-amber-500 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 py-2.5 text-xs font-bold text-slate-950 hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50"
             >
               <Shield className="h-4 w-4" />
               <span>{isLoading ? 'Verifying Credentials...' : 'Authenticate & Start Shift'}</span>

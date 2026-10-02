@@ -6,35 +6,42 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
-  Scan,
   CreditCard,
-  Edit2,
   PlusCircle,
   X,
-  Sparkles
+  Lock,
+  Building2,
+  LogOut,
+  Sparkles,
+  QrCode,
+  ShieldAlert
 } from 'lucide-react';
-import { Student, StudentStatus } from '../types';
+import { RegistrarStaff, Student, StudentStatus } from '../types';
+import { StudentIdCardGenerator } from './StudentIdCardGenerator';
 import femalePhoto1 from '@/src/assets/images/student_portrait_female_1_1790940633236.jpg';
 import malePhoto1 from '@/src/assets/images/student_portrait_male_1_1790940644556.jpg';
 
 interface RegistryViewProps {
   students: Student[];
+  registrarStaff: RegistrarStaff | null;
+  onOpenRegistrarAuth: () => void;
+  onRegistrarLogout: () => void;
   onAddStudent: (newStudent: Student) => void;
   onUpdateStudentStatus: (id: string, newStatus: StudentStatus, newExpiry?: string) => void;
-  onScanStudent: (code: string) => void;
-  onPreviewBadge: (student: Student) => void;
 }
 
 export const RegistryView: React.FC<RegistryViewProps> = ({
   students,
+  registrarStaff,
+  onOpenRegistrarAuth,
+  onRegistrarLogout,
   onAddStudent,
-  onUpdateStudentStatus,
-  onScanStudent,
-  onPreviewBadge
+  onUpdateStudentStatus
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | StudentStatus>('ALL');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [generatedStudentBadge, setGeneratedStudentBadge] = useState<Student | null>(null);
 
   // New Student Form State
   const [newFullName, setNewFullName] = useState('');
@@ -46,6 +53,45 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
   const [newCampus, setNewCampus] = useState('Main Campus - Kansanga');
   const [newExpiryDate, setNewExpiryDate] = useState('2028-12-31');
   const [newStatus, setNewStatus] = useState<StudentStatus>('active');
+  const [newNationalId, setNewNationalId] = useState('CF' + Math.floor(100000000 + Math.random() * 900000000));
+  const [newEmergencyContact, setNewEmergencyContact] = useState('+256 772 000 000');
+
+  // Gated Access: If registrar staff is not logged in, show restricted portal lock
+  if (!registrarStaff) {
+    return (
+      <div className="max-w-2xl mx-auto rounded-2xl border-2 border-slate-800 bg-slate-900/80 p-8 sm:p-12 text-center space-y-6 shadow-2xl backdrop-blur-sm">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+          <Lock className="h-8 w-8" />
+        </div>
+
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-800 px-3 py-1 text-xs font-mono font-semibold text-emerald-400 border border-slate-700">
+            <Building2 className="h-3.5 w-3.5" />
+            <span>Academic Registrar &amp; ID Card Issuance Directorate</span>
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-black text-white">
+            Restricted Access: Student Enrollment &amp; ID Generation
+          </h2>
+
+          <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+            Security guards are strictly unauthorized to register new students or print ID badges. Access is reserved exclusively for the <strong>Office of the Academic Registrar</strong> and <strong>ID Card Production Team</strong>.
+          </p>
+        </div>
+
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={onOpenRegistrarAuth}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition-colors shadow-lg shadow-emerald-500/20"
+          >
+            <Lock className="h-4 w-4" />
+            <span>Authenticate as Academic Registrar</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const filteredStudents = students.filter((s) => {
     const matchesStatus = statusFilter === 'ALL' || s.status === statusFilter;
@@ -76,13 +122,16 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
       expiryDate: newExpiryDate,
       status: newStatus,
       photoUrl: newGender === 'Female' ? femalePhoto1 : malePhoto1,
-      nationalIdOrPassport: 'CF' + Math.floor(100000000 + Math.random() * 900000000),
-      emergencyContact: '+256 700 000 000',
-      notes: 'Added via security checkpoint registry portal.'
+      nationalIdOrPassport: newNationalId || 'CF' + Math.floor(100000000 + Math.random() * 900000000),
+      emergencyContact: newEmergencyContact || '+256 700 000 000',
+      notes: `Enrolled by ${registrarStaff.fullName} (${registrarStaff.staffId})`
     };
 
     onAddStudent(newStudent);
     setShowAddModal(false);
+
+    // Immediately open the ID card generator for the newly created student!
+    setGeneratedStudentBadge(newStudent);
 
     // Reset inputs
     setNewFullName('');
@@ -91,27 +140,71 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+      {/* Active Registrar Staff Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-5">
         <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Database className="h-5 w-5 text-amber-400" />
-            <span>KIU Student Registry (SQL Database Engine)</span>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950 border border-emerald-800 px-2 py-0.5 rounded">
+              Registrar Portal Active
+            </span>
+            <span className="text-xs text-slate-300 font-semibold">
+              {registrarStaff.fullName} ({registrarStaff.role})
+            </span>
+          </div>
+          <h2 className="text-base font-bold text-white mt-1 flex items-center gap-2">
+            <Database className="h-5 w-5 text-emerald-400" />
+            <span>KIU Student Enrollment &amp; ID Card Production Engine</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Authoritative institutional database used by checkpoint scanners to verify student identity, validity, and enrollment status.
+          <p className="text-xs text-slate-400 mt-0.5">
+            Add new students, update enrollment status, and generate Front and Back official ID cards with unique QR codes.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-colors shadow-sm shadow-amber-500/10"
-        >
-          <UserPlus className="h-4 w-4" />
-          <span>Register New Student</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition-colors shadow-md shadow-emerald-500/20"
+          >
+            <UserPlus className="h-4 w-4" />
+            <span>Enroll New Student</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onRegistrarLogout}
+            title="Lock Registrar Portal"
+            className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Sign Out</span>
+          </button>
+        </div>
       </div>
+
+      {/* Generated ID Card Preview Modal */}
+      {generatedStudentBadge && (
+        <div className="rounded-2xl border-2 border-emerald-500/80 bg-slate-900 p-6 shadow-2xl space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+              <QrCode className="h-4 w-4" />
+              <span>Official KIU ID Card Generator (Front &amp; Back Unique QR)</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setGeneratedStudentBadge(null)}
+              className="p-1 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <StudentIdCardGenerator
+            student={generatedStudentBadge}
+            onClose={() => setGeneratedStudentBadge(null)}
+          />
+        </div>
+      )}
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between rounded-xl border border-slate-800 bg-slate-900/80 p-3.5">
@@ -123,8 +216,8 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by student name, Reg No, course or faculty..."
-            className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:border-amber-400 focus:outline-none"
+            placeholder="Search registry by student name, Reg No, course or faculty..."
+            className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
           />
         </div>
 
@@ -137,7 +230,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
               onClick={() => setStatusFilter(st)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md uppercase transition-colors ${
                 statusFilter === st
-                  ? 'bg-amber-500 text-slate-950 shadow-sm'
+                  ? 'bg-emerald-500 text-slate-950 shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -147,7 +240,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
         </div>
       </div>
 
-      {/* Student Table */}
+      {/* Student Registry Table */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
@@ -158,7 +251,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                 <th className="py-3 px-4">Course & Faculty</th>
                 <th className="py-3 px-4">Card Expiry</th>
                 <th className="py-3 px-4">Status Flag</th>
-                <th className="py-3 px-4 text-right">Verification Actions</th>
+                <th className="py-3 px-4 text-right">Card Production</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 font-sans">
@@ -187,7 +280,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                     </td>
 
                     {/* Reg No */}
-                    <td className="py-3 px-4 font-mono font-bold text-amber-400 whitespace-nowrap">
+                    <td className="py-3 px-4 font-mono font-bold text-emerald-400 whitespace-nowrap">
                       {student.regNumber}
                     </td>
 
@@ -210,11 +303,6 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                       >
                         {student.expiryDate}
                       </span>
-                      {isExpiredDate && (
-                        <span className="block text-[10px] text-rose-400 uppercase font-semibold">
-                          Date Elapsed
-                        </span>
-                      )}
                     </td>
 
                     {/* Status Toggle */}
@@ -239,29 +327,17 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                       </select>
                     </td>
 
-                    {/* Actions */}
+                    {/* Action: Generate Front & Back ID Card */}
                     <td className="py-3 px-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => onScanStudent(student.regNumber)}
-                          className="flex items-center gap-1 rounded-lg bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-500 hover:text-slate-950 transition-colors"
-                          title="Simulate scanning this student at gate"
-                        >
-                          <Scan className="h-3.5 w-3.5" />
-                          <span>Scan</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => onPreviewBadge(student)}
-                          className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs text-slate-300 hover:bg-slate-700 transition-colors"
-                          title="View Official KIU Student ID Card"
-                        >
-                          <CreditCard className="h-3.5 w-3.5" />
-                          <span>Card</span>
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setGeneratedStudentBadge(student)}
+                        className="flex items-center gap-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/40 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 transition-colors ml-auto shadow-sm"
+                        title="Generate Front and Back ID Card with Unique QR Code"
+                      >
+                        <QrCode className="h-3.5 w-3.5" />
+                        <span>Generate Front &amp; Back ID</span>
+                      </button>
                     </td>
                   </tr>
                 );
@@ -273,13 +349,13 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
 
       {/* Add Student Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
           <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-6 py-4">
               <div className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4 text-amber-400" />
+                <UserPlus className="h-4 w-4 text-emerald-400" />
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                  Register New KIU Student Record
+                  Enroll New KIU Student (Academic Registrar)
                 </h3>
               </div>
               <button
@@ -302,7 +378,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                     value={newFullName}
                     onChange={(e) => setNewFullName(e.target.value)}
                     placeholder="e.g. Dennis Mugisha"
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-amber-400 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -316,7 +392,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                     value={newRegNumber}
                     onChange={(e) => setNewRegNumber(e.target.value)}
                     placeholder="e.g. 2025-01-09941"
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 font-mono text-xs text-white focus:border-amber-400 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 font-mono text-xs text-white focus:border-emerald-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -328,7 +404,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                   <select
                     value={newGender}
                     onChange={(e) => setNewGender(e.target.value as 'Male' | 'Female')}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-amber-400 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-400 focus:outline-none"
                   >
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -340,7 +416,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                   <select
                     value={newCampus}
                     onChange={(e) => setNewCampus(e.target.value)}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-amber-400 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-400 focus:outline-none"
                   >
                     <option value="Main Campus - Kansanga">Main Campus - Kansanga</option>
                     <option value="Western Campus - Ishaka">Western Campus - Ishaka</option>
@@ -353,13 +429,13 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                 <select
                   value={newFaculty}
                   onChange={(e) => setNewFaculty(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-amber-400 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-400 focus:outline-none"
                 >
                   <option value="School of Computing & Information Technology">
-                    School of Computing & Information Technology
+                    School of Computing &amp; Information Technology
                   </option>
                   <option value="Faculty of Medicine & Surgery">
-                    Faculty of Medicine & Surgery
+                    Faculty of Medicine &amp; Surgery
                   </option>
                   <option value="School of Law">School of Law</option>
                   <option value="Faculty of Business and Management">
@@ -377,7 +453,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                   value={newCourse}
                   onChange={(e) => setNewCourse(e.target.value)}
                   placeholder="e.g. Bachelor of Science in Computer Science"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-amber-400 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-400 focus:outline-none"
                   required
                 />
               </div>
@@ -391,7 +467,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                     type="date"
                     value={newExpiryDate}
                     onChange={(e) => setNewExpiryDate(e.target.value)}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 font-mono text-xs text-white focus:border-amber-400 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 font-mono text-xs text-white focus:border-emerald-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -403,7 +479,7 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
                   <select
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value as StudentStatus)}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-amber-400 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-400 focus:outline-none"
                   >
                     <option value="active">Active (Permitted)</option>
                     <option value="expired">Expired (Denied)</option>
@@ -415,9 +491,9 @@ export const RegistryView: React.FC<RegistryViewProps> = ({
               <div className="pt-3">
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-amber-500 py-3 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-colors shadow-md shadow-amber-500/20"
+                  className="w-full rounded-xl bg-emerald-500 py-3 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition-colors shadow-md shadow-emerald-500/20"
                 >
-                  Save Record to Database
+                  Save Record &amp; Generate Front/Back ID Card
                 </button>
               </div>
             </form>

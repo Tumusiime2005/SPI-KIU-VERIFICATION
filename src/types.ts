@@ -31,6 +31,16 @@ export interface SecurityOfficer {
   lastLoginTime?: string;
 }
 
+export interface RegistrarStaff {
+  id: string;
+  staffId: string;
+  fullName: string;
+  username: string;
+  role: 'Academic Registrar' | 'ID Production Officer' | 'Directorate of Student Affairs';
+  department: string;
+  authenticatedAt?: string;
+}
+
 export type ScanOutcome = 'GRANTED' | 'DENIED';
 
 export type RejectionReason =

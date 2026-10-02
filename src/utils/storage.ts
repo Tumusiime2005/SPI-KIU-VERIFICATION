@@ -1,12 +1,37 @@
-import { INITIAL_OFFICERS, INITIAL_STUDENTS } from '../data/mockData';
-import { CheckpointStats, ScanOutcome, ScanRecord, SecurityOfficer, Student } from '../types';
+import { INITIAL_OFFICERS, INITIAL_REGISTRAR_STAFF, INITIAL_STUDENTS } from '../data/mockData';
+import { CheckpointStats, RegistrarStaff, ScanOutcome, ScanRecord, SecurityOfficer, Student } from '../types';
 
 const STORAGE_KEYS = {
   STUDENTS: 'spi_kiu_students_v2',
   OFFICER_SESSION: 'spi_kiu_active_officer_v1',
+  REGISTRAR_SESSION: 'spi_kiu_registrar_session_v1',
   SCAN_LOGS: 'spi_kiu_scan_logs_v1',
   STATS: 'spi_kiu_stats_v1'
 };
+
+export function getActiveRegistrarStaff(): RegistrarStaff | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.REGISTRAR_SESSION);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {
+    // fallback
+  }
+  return null;
+}
+
+export function saveActiveRegistrarStaff(staff: RegistrarStaff | null): void {
+  try {
+    if (staff) {
+      localStorage.setItem(STORAGE_KEYS.REGISTRAR_SESSION, JSON.stringify(staff));
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.REGISTRAR_SESSION);
+    }
+  } catch {
+    // ignore
+  }
+}
 
 export function getStoredStudents(): Student[] {
   try {
