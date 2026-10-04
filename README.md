@@ -60,3 +60,4 @@ npm run preview
   - **Access Denied (RED)**: Immediate warning prompt with explicit denial reason (Expired card, Unregistered/Alien ID, Disciplinary suspension).
 - **Officer Authentication**: Checkpoint guard login with PIN/password, gate selection, and shift logging.
 - **SQL / Audit Trail Data Collection**: Live security log with CSV export capability and real-time shift counters.
+Creator name is Tumusiime Elton.
